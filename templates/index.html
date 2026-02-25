@@ -1,27 +1,43 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello World</title>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kyachra Home</title>
+  </head>
+  <body>
     <h2>Create New Notices</h2>
-    <form action="{{url_for('create_notice')}}" method="post">
-        <input type="text" name="title" placeholder="title" required>
-        <br><br>
-        <textarea name="content" placeholder="Write the nonsense here.." required></textarea>
-        <br><br>
-        <button type="submit">Issue</button>
-    </form>
-<hr>
+    <a href="{{ url_for('notices_bp.create_notice') }}">
+      <button>Create New Notice</button>
+    </a>
+    <hr />
     <h2>Previously issued notices</h2>
     {% for notice in notices%}
     <h3>{{notice.title}}</h3>
     <small>Issued At:{{notice.issued_at.strftime('%Y-%m-%d %H:%M')}}</small>
     <p>{{notice.content}}</p>
-    
-    <a href="{{url_for('delete_notice',id=notice.id)}}">Delete</a>
+    <span>
+      <a href="{{ url_for('notices_bp.edit_notice', id=notice.id) }}">
+        <button>Edit</button>
+      </a>
+      <form
+        action="{{ url_for('notices_bp.delete_notice', id=notice.id) }}"
+        method="POST"
+        style="display: inline"
+      >
+        <button type="submit">Delete</button>
+      </form>
+    </span>
     {%endfor%}
-</body>
+    <hr />
+    <h1>Release Notes V 0.0</h1>
+    <p>
+      TBH this is more of a peronal learning project as of now. The things I
+      said about taking kyachra to a global level may be possible only if others
+      support. However, I will maintain this for some time, which can increase
+      if even some of you viewing this, help taking kyachra to a global level by
+      sparing 9 minutes 15 seconds to 15 minutes 9 seconds each day. DM me to
+      know how you can contribute.
+    </p>
+  </body>
 </html>
