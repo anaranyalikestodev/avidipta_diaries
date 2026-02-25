@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello World</title>
+</head>
+<body>
+    <h2>Create New Notices</h2>
+    <form action="{{url_for('create_notice')}}" method="post">
+        <input type="text" name="title" placeholder="title" required>
+        <br><br>
+        <textarea name="content" placeholder="Write the nonsense here.." required></textarea>
+        <br><br>
+        <button type="submit">Issue</button>
+    </form>
+<hr>
+    <h2>Previously issued notices</h2>
+    {% for notice in notices%}
+    <h3>{{notice.title}}</h3>
+    <small>Issued At:{{notice.issued_at.strftime('%Y-%m-%d %H:%M')}}</small>
+    <p>{{notice.content}}</p>
+    
+    <a href="{{url_for('delete_notice',id=notice.id)}}">Delete</a>
+    {%endfor%}
+</body>
+</html>
