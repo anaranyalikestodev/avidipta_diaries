@@ -1,54 +1,79 @@
-from flask import Blueprint,render_template,request,redirect,url_for,flash
-from models.notice import db,Notice
+from flask import Blueprint, render_template, request, redirect, url_for, flash
+from models.notice import db, Notice
 
-notice_bp=Blueprint("notice_bp",__name__, template_folder="templates")
+notice_bp = Blueprint("notice_bp", __name__, template_folder="templates")
 
-#Read Route
+# READ (Home Page)
 @notice_bp.route("/")
 def index():
-    notices=Notice.query.order_by(Notice.issued_at.desc()).all()
-    return render_template("index.html",notices=notices)
+    notices = Notice.query.order_by(Notice.issued_at.desc()).all()
+    return render_template("index.html", notices=notices, title="House of Kyachra")
 
-#Create Route
-@notice_bp.route("/create",methods=["GET","POST"])
+# CREATE
+@notice_bp.route("/create", methods=["GET", "POST"])
 def create_notice():
-    if request.method=="POST":
-        title=request.form["title"].strip()
-        content=request.form["content"].strip()
-        if not title or content:
-            flash("Fields cannot be empty")
-            return redirect(request.referrer)
-      
-        new_notice=Notice(title=title,content=content)
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        content = request.form.get("content", "").strip()
+        issued_by=request.form.get("issued_by").strip()
+        # Validation
+        if not title or not content or not issued_by:
+            flash("Fields cannot be empty", "danger")
+            return render_template(
+                "cu.html",
+                title="Create Notice",
+                title_value=title,
+                content_value=content,issued_by=issued_by
+            )
+
+        new_notice = Notice(title=title, content=content,issued_by=issued_by)
         db.session.add(new_notice)
         db.session.commit()
-        return redirect(url_for("notices_bp.index",notice=None))
 
-    return redirect(url_for("cu.html",notice=None))
+        flash("Notice created successfully!", "success")
+        return redirect(url_for("notice_bp.index"))
 
-#Edit Route
-def edit_notices(id):
-    notice=Notice.query.get(id)
-    return render_template("edit.html",notice=notice)
+    return render_template("cu.html", title="Create Notice")
 
-#Update Route
+# EDIT
+@notice_bp.route("/edit/<int:id>", methods=["GET"])
+def edit(id):
+    notice = Notice.query.get_or_404(id)
+    return render_template(
+        "cu.html",
+        title="Edit Notice",
+        notice=notice
+    )
+
+# UPDATE
 @notice_bp.route("/update/<int:id>", methods=["POST"])
 def update_notice(id):
-    notice=Notice.query.get(id)
-    notice.title=request.form["title"]
-    notice.content=request.form["content"]
-    db.session.commit()
-    return redirect(url_for("notices_bp.index"))
+    notice = Notice.query.get_or_404(id)
 
-#Delete Route
-@notice_bp.route("/update/<int:id>",methods=["POST"])
-def edit(id):
-    notice=Notice.query.get_or_404(id)
-    return render_template("CU.html")
-@notice_bp.route("/delete/<int:id>")
+    title = request.form.get("title", "").strip()
+    content = request.form.get("content", "").strip()
+
+    if not title or not content:
+        flash("Fields cannot be empty", "danger")
+        return render_template(
+            "cu.html",
+            title="Edit Notice",
+            notice=notice
+        )
+
+    notice.title = title
+    notice.content = content
+    db.session.commit()
+
+    flash("Notice updated successfully!", "success")
+    return redirect(url_for("notice_bp.index"))
+
+# DELETE
+@notice_bp.route("/delete/<int:id>", methods=["POST"])
 def delete_notice(id):
-    notice=Notice.query.get_or_404(id)
+    notice = Notice.query.get_or_404(id)
     db.session.delete(notice)
     db.session.commit()
 
-    return redirect(url_for("index"))
+    flash("Notice deleted successfully!", "success")
+    return redirect(url_for("notice_bp.index"))

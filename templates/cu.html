@@ -1,29 +1,36 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ "Edit" if notice else "Create" }}</title>
-  </head>
-  <body>
-    <h1>{{ "Edit" notice.title if notice else "Create Notice" }}</h1>
-    <form
-      action="{{url_for('notices_bp.update_notice,id=notice.id') if notice else url_for('notices_bp.create_notice')}}"
-      method="post"
-    >
-      <label>Title:</label>
-      <input
-        type="text"
-        name="title"
-        value="{{notice.title if notice else '' }}"
-        required
-      />
-      <br /><br />
-      <label>Content:</label>
-      <textarea name="content" rows="5" required>{{ notice.content if notice else '' }}</textarea>
-    <br><br>
-    <button type="submit">{{ "Update" if notice else "Create" }}</button>
-    <a href="{{ url_for('notices_bp.index') }}"><button type="button">Cancel</button></a>
-    </form>
-  </body>
-</html>
+{% extends "base.html" %}
+{% block content %}
+
+<!-- Form Title -->
+<h1 class="text-center">{{ 'Edit ' ~ notice.title if notice else 'Create Notice' }}</h1>
+
+<!-- Form -->
+<form action="{{ url_for('notice_bp.update_notice', id=notice.id) if notice else url_for('notice_bp.create_notice') }}" method="POST">
+    <!-- Title -->
+    <div class="mb-3">
+        <label for="title" class="form-label">Title:</label>
+        <input type="text" name="title" id="title" class="form-control" value="{{ request.args.get('title') or notice.title if notice else '' }}" required />
+    </div>
+
+    <!-- Content -->
+    <div class="mb-3">
+        <label for="content" class="form-label">Content:</label>
+        <textarea name="content" id="content" class="form-control" rows="8" required>{{ request.args.get('content') or notice.content if notice else '' }}</textarea>
+    </div>
+
+    <!-- Issued By (only for Create) -->
+    {% if not notice %}
+    <div class="mb-3">
+        <label for="issued_by" class="form-label">Issued By:</label>
+        <input type="text" name="issued_by" id="issued_by" class="form-control" value="{{ request.args.get('issued_by') or '' }}" required />
+    </div>
+    {% endif %}
+
+    <!-- Submit Button -->
+    <div class="d-flex justify-content-between">
+        <button type="submit" class="btn btn-primary">{{ 'Update' if notice else 'Create' }}</button>
+        <a href="{{ url_for('notice_bp.index') }}" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+
+{% endblock %}

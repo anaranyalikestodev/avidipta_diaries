@@ -1,9 +1,12 @@
 from flask import Flask,render_template,request,redirect,url_for
 from models.notice import db, Notice
 from routes.notice_routes import notice_bp
+from dotenv import load_dotenv
 import os
 
+
 def create_app():
+    load_dotenv()
     app=Flask(__name__)
 
     #DB Config
@@ -11,15 +14,19 @@ def create_app():
     app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
     "DATABASE_URL", "sqlite:///database.db")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    
+
     db.init_app(app)
     app.register_blueprint(notice_bp, url_prefix="/notices")
 
     with app.app_context():
         db.create_all()
+    
+    @app.route("/")
+    def home():
+        return redirect(url_for('notice_bp.index'))
 
     return app
 
 if __name__ == "__main__":
     app=create_app()
-    app.run()
+    app.run(debug=True)
