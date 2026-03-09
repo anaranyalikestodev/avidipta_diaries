@@ -1,7 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy 
 from datetime import datetime
-
-db=SQLAlchemy()
+from extensions import db
 
 class Notice(db.Model):
     __tablename__ = "notices"

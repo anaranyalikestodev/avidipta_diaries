@@ -1,5 +1,19 @@
 {% extends "base.html" %}
 {% block content %}
+<nav class="navbar navbar-expand-lg navbar-light bg-danger shadow-sm">
+    <div class="container">
+        <!-- Left text / brand -->
+        <a class="navbar-brand fw-semibold" href="/">
+            Maintained By ICSrbpWBH
+        </a>
+        <!-- Right button -->
+        <div class="ms-auto">
+            <a href="{{ url_for('auth_bp.login') }}" class="btn ">
+                WKN-Chapter1
+            </a>
+        </div>
+    </div>
+</nav>
 <div class="demo-highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>

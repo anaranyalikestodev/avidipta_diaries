@@ -1,6 +1,6 @@
 from flask import Flask, redirect, url_for,render_template
-from models.notice import db
 from routes.notice_routes import notice_bp
+from routes.auth_routes import auth_bp
 from config import Config
 from extensions import db, migrate, bcrypt, api, cors
 
@@ -15,9 +15,7 @@ def create_app():
     cors.init_app(app)
 
     app.register_blueprint(notice_bp, url_prefix="/notices")
-
-    with app.app_context():
-        db.create_all()
+    app.register_blueprint(auth_bp, url_prefix="/auth")
 
     @app.route("/")
     def home():

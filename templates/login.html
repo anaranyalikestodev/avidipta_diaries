@@ -1,0 +1,27 @@
+{% extends "base.html" %} {% block content %}
+<div class="container vh-100 d-flex justify-content-center align-items-center">
+  <div class="card shadow-lg border-0" style="width: 400px">
+    <div class="card-body p-4">
+      <h4 class="text-center mb-4">Admin Access</h4>
+
+      <form method="POST" action="{{ url_for('auth_bp.login')}}">
+        <div class="mb-3">
+          <label class="form-label">Enter Admin Key</label>
+          <input
+            type="password"
+            name="key"
+            class="form-control"
+            placeholder="Enter key"
+            required
+          />
+        </div>
+
+        <div class="d-grid">
+          <button class="btn btn-primary">Access Notices</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {% endblock %}
+</div>

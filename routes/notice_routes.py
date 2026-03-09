@@ -1,8 +1,15 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash
 from models.notice import db, Notice
+from flask_login import current_user
+from flask import abort,request,jsonify,session
 
 notice_bp = Blueprint("notice_bp", __name__, template_folder="templates")
 
+@notice_bp.before_request
+def protect_notices():
+    if not session.get("admin"):
+        return redirect("auth/login")
+        
 # READ (Home Page)
 @notice_bp.route("/")
 def index():
