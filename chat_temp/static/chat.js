@@ -1,103 +1,88 @@
-const socket = io()
+const socket = io();
 
-let user = null
-let session = null
-const urlParams=new URLSearchParams(window.location.search)
+let user = null;
+let session = null;
+const urlParams = new URLSearchParams(window.location.search);
 
-if(urlParams.has("session")){
-document.getElementById("session").value=urlParams.get("session")
+if (urlParams.has("session")) {
+  document.getElementById("session").value = urlParams.get("session");
 }
 
-function join(){
-    
-history.replaceState(null,"","?session="+session)
-user=document.getElementById("user").value
+function join() {
 
-session=document.getElementById("session").value
-const password=document.getElementById("password").value
+  user = document.getElementById("user").value.trim();
+  session = document.getElementById("session").value.trim();
+  const password = document.getElementById("password").value;
 
-socket.emit("chat_join",{user,password,session})
+  history.replaceState(null, "", "?session=" + session);
 
+  socket.emit("chat_join", { user, password, session });
 }
 
+socket.on("chat_joined", () => {
+  document.getElementById("login").classList.add("d-none");
+  document.getElementById("chat").classList.remove("d-none");
+});
 
-socket.on("chat_joined",()=>{
+socket.on("chat_message", (msg) => {
+  const box = document.getElementById("chatbox");
 
-document.getElementById("login").classList.add("d-none")
-document.getElementById("chat").classList.remove("d-none")
+  const wrapper = document.createElement("div");
 
-})
+  wrapper.classList.add("message");
 
+  if (msg.user === user) wrapper.classList.add("self");
+  else wrapper.classList.add("other");
 
-socket.on("chat_message",(msg)=>{
+  const name = document.createElement("div");
+  name.className = "msg-name";
+  name.innerText = msg.user;
 
-const box=document.getElementById("chatbox")
+  const text = document.createElement("div");
+  text.className = "msg-text";
+  text.innerText = msg.text;
 
-const wrapper=document.createElement("div")
+  const time = document.createElement("div");
+  time.className = "msg-time";
 
-wrapper.classList.add("message")
+  const date = new Date(msg.time * 1000);
+  const ist = date.toLocaleTimeString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    hour12: false,
+  });
 
-if(msg.user===user)
-wrapper.classList.add("self")
-else
-wrapper.classList.add("other")
+  time.innerText = ist;
 
+  wrapper.appendChild(name);
+  wrapper.appendChild(text);
+  wrapper.appendChild(time);
 
-const name=document.createElement("div")
-name.className="msg-name"
-name.innerText=msg.user
+  box.appendChild(wrapper);
 
+  box.scrollTop = box.scrollHeight;
 
-const text=document.createElement("div")
-text.className="msg-text"
-text.innerText=msg.text
+  setTimeout(() => {
+    wrapper.remove();
+  }, 60000);
+});
 
+socket.on("error", (e) => {
+  alert(e.msg);
+});
 
-const time=document.createElement("div")
-time.className="msg-time"
+function send() {
+  const text = document.getElementById("msg").value;
 
-const date=new Date(msg.time*1000)
-const ist=date.toLocaleTimeString("en-IN",{timeZone:"Asia/Kolkata",hour12:false})
+  if (text.trim() === "") return;
 
-time.innerText=ist
+  socket.emit("chat_message", { user, session, text });
 
-
-wrapper.appendChild(name)
-wrapper.appendChild(text)
-wrapper.appendChild(time)
-
-box.appendChild(wrapper)
-
-box.scrollTop=box.scrollHeight
-
-
-setTimeout(()=>{
-wrapper.remove()
-},60000)
-
-})
-
-
-socket.on("error",(e)=>{
-alert(e.msg)
-})
-
-
-function send(){
-
-const text=document.getElementById("msg").value
-
-if(text.trim()==="") return
-
-socket.emit("chat_message",{user,session,text})
-
-document.getElementById("msg").value=""
-
+  document.getElementById("msg").value = "";
 }
 
-
-document.getElementById("msg").addEventListener("keypress",function(e){
-if(e.key==="Enter"){
-send()
-}
-})
+document.getElementById("msg").addEventListener("keydown", function (e) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    send();
+  }
+});
